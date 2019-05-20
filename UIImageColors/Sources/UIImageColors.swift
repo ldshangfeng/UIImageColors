@@ -13,13 +13,13 @@
     import UIKit
 #endif
 
-public struct UIImageColors {
-    public var background: UIColor!
-    public var primary: UIColor!
-    public var secondary: UIColor!
-    public var detail: UIColor!
+open class UIImageColors: NSObject {
+    @objc open var background: UIColor!
+    @objc open var primary: UIColor!
+    @objc open var secondary: UIColor!
+    @objc open var detail: UIColor!
   
-    public init(background: UIColor, primary: UIColor, secondary: UIColor, detail: UIColor) {
+	@objc public init(background: UIColor, primary: UIColor, secondary: UIColor, detail: UIColor) {
       self.background = background
       self.primary = primary
       self.secondary = secondary
@@ -27,7 +27,8 @@ public struct UIImageColors {
     }
 }
 
-public enum UIImageColorsQuality: CGFloat {
+
+@objc public enum UIImageColorsQuality: NSInteger {
     case lowest = 50 // 50px
     case low = 100 // 100px
     case high = 250 // 250px
@@ -204,7 +205,7 @@ extension UIImage {
         }
     #endif
 
-    public func getColors(quality: UIImageColorsQuality = .high, _ completion: @escaping (UIImageColors?) -> Void) {
+    @objc public func getColors(quality: UIImageColorsQuality = .high, _ completion: @escaping (UIImageColors?) -> Void) {
         DispatchQueue.global().async {
             let result = self.getColors(quality: quality)
             DispatchQueue.main.async {
@@ -213,15 +214,15 @@ extension UIImage {
         }
     }
 
-    public func getColors(quality: UIImageColorsQuality = .high) -> UIImageColors? {
+    @objc public func getColors(quality: UIImageColorsQuality = .high) -> UIImageColors? {
         var scaleDownSize: CGSize = self.size
         if quality != .highest {
             if self.size.width < self.size.height {
                 let ratio = self.size.height/self.size.width
-                scaleDownSize = CGSize(width: quality.rawValue/ratio, height: quality.rawValue)
+                scaleDownSize = CGSize(width: CGFloat(quality.rawValue)/ratio, height: CGFloat(quality.rawValue))
             } else {
                 let ratio = self.size.width/self.size.height
-                scaleDownSize = CGSize(width: quality.rawValue, height: quality.rawValue/ratio)
+                scaleDownSize = CGSize(width: CGFloat(quality.rawValue), height: CGFloat(quality.rawValue)/ratio)
             }
         }
         
