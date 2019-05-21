@@ -18,12 +18,14 @@ open class UIImageColors: NSObject {
     @objc open var primary: UIColor!
     @objc open var secondary: UIColor!
     @objc open var detail: UIColor!
+	@objc open var button: UIColor!
   
-	@objc public init(background: UIColor, primary: UIColor, secondary: UIColor, detail: UIColor) {
+	@objc public init(background: UIColor, primary: UIColor, secondary: UIColor, detail: UIColor, button: UIColor) {
       self.background = background
       self.primary = primary
       self.secondary = secondary
       self.detail = detail
+	  self.button = button
     }
 }
 
@@ -238,7 +240,7 @@ extension UIImage {
         let height: Int = cgImage.height
         
         let threshold = Int(CGFloat(height)*0.01)
-        var proposed: [Double] = [-1,-1,-1,-1]
+        var proposed: [Double] = [-1,-1,-1,-1,-1]
         
         guard let data = CFDataGetBytePtr(cgImage.dataProvider!.data) else {
             fatalError("UIImageColors.getColors failed: could not get cgImage data.")
@@ -328,14 +330,19 @@ extension UIImage {
                     continue
                 }
                 proposed[3] = color
-                break
-            }
+			} else if proposed[4] == -1 {
+				if !color.isContrasting(proposed[0]) || !proposed[3].isDistinct(color) || !proposed[2].isDistinct(color) || !proposed[1].isDistinct(color) {
+					continue
+				}
+				proposed[4] = color
+				break
+		}
         }
         
         let isDarkBackground = proposed[0].isDarkColor
-        for i in 1...3 {
+        for i in 1...4 {
             if proposed[i] == -1 {
-                proposed[i] = isDarkBackground ? 255255255:0
+                proposed[i] = isDarkBackground ? 237237237:0
             }
         }
         
@@ -343,7 +350,8 @@ extension UIImage {
             background: proposed[0].uicolor,
             primary: proposed[1].uicolor,
             secondary: proposed[2].uicolor,
-            detail: proposed[3].uicolor
+            detail: proposed[4].uicolor,
+			button: proposed[3].uicolor
         )
     }
 }
